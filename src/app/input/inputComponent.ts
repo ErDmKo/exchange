@@ -64,7 +64,7 @@ export class inputComponent extends Component<InputProps> {
         return;
       }
       setValid(true);
-    }, 700)
+    }, 1000)
   onInput = (
     setAmount: (val: number) => void,
     setValid: (val: boolean) => void,

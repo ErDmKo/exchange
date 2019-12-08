@@ -15,7 +15,7 @@ afterAll(() => {
     browser.close();
 });
 
-const ACTION_TIMEOUT = 1000;
+const ACTION_TIMEOUT = 1100;
 
 
 describe("Simple e2e tests", () => {
@@ -45,9 +45,10 @@ describe("Simple e2e tests", () => {
         await page.click('#exch');
         const usdPocketNew = await page.$eval('#pUSD', (e: any) => e.innerText)
         const euroPocketNew = await page.$eval('#pEUR', (e: any) => e.innerText)
-        expect(parseInt(usdPocket) - 10).toBe(parseInt(usdPocketNew));
-        expect(parseInt(euroPocket) + (10 * parseFloat(raite)))
-            .toBe(parseInt(euroPocketNew));
+        expect((parseInt(usdPocket) - 10).toFixed())
+            .toBe(parseInt(usdPocketNew).toFixed());
+        expect((parseInt(euroPocket) + (10 * parseFloat(raite))).toFixed())
+            .toBe(parseInt(euroPocketNew).toFixed());
     });
     test("change currnecys on top and bottom", async () => {
         await expect(page.$eval('#nFUSD', (e: any) => e.innerText))
@@ -84,5 +85,5 @@ describe("Simple e2e tests", () => {
         const usdAmount = await page.$eval('#iTUSD', (e: any) => e.innerText)
         expect(parseFloat(usdAmount).toFixed())
             .toBe((10 * parseFloat(usdRaite)).toFixed());
-    });
+    }, 10000);
 })
