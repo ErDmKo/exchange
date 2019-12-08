@@ -1,6 +1,7 @@
 .input, .input_to {
     position: absolute;
     top: 30px;
+    z-index: 1;
     right: 20px;
     outline: none;
     min-width: 10px;

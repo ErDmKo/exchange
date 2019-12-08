@@ -32,8 +32,19 @@
         width: 100%;
         color: #fff;
         display: inline-block;
-        height: 200px;
+        height: 160px;
+        background: transparent;
         position: relative;
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            cursor: pointer;
+            bottom: 0px;
+            background: transparent;
+            right: 0px;
+        }
     }
     &__name {
         position: absolute;

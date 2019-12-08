@@ -1,7 +1,6 @@
 # Currency exchange app
 
-This is some abstract app which implement currency exchange functionality. You have some pockets whith money and you can change balanse this pockets by exchanging it to other. You can use any dirrection.
-Stack pReact, Redux, Typescript.
+This is an abstract app which implements currency exchange functionality. You have a few pockets with different currencies and you can exchange one to another. Stack includes pReact, Redux, Typescript.
 
 ## How to install
 ```

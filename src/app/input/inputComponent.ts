@@ -12,7 +12,7 @@ export type InputProps = {
   isFocused?: boolean
   selectCurrency?: (name: string) => void
 };
-const notNumbers = /[^\d\.]+/i
+const notNumbers = /[^\d\.\,]+/i
 export class inputComponent extends Component<InputProps> {
   cursorPosition: number = 0;
   focused: boolean = false;
@@ -60,7 +60,7 @@ export class inputComponent extends Component<InputProps> {
         return;
       }
       setValid(true);
-    }, 300)
+    }, 1000)
   onInput = (
     setAmount: (val: number) => void,
     setValid: (val: boolean) => void,
@@ -69,6 +69,7 @@ export class inputComponent extends Component<InputProps> {
     setValid(false);
     const inputElem = e.target as HTMLInputElement;
     let val = inputElem.innerHTML.replace(notNumbers, '');
+    val = val.replace(',', '.');
     const sel = window.getSelection();
     if (!sel) {
       return;
