@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "noImplicitUseStrict": true,
+        "target": "ES2018",
+        "alwaysStrict": false,
+        "strict": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "keyofStringsOnly": true,
+        "noEmit": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "lib": [
+            "es2017",
+            "dom"
+        ],
+        "types": [
+            "node",
+        ],
+        "typeRoots": [
+            "@types",
+            "./node_modules/@types"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "@src/*": [
+                "./src/*"
+            ],
+            "@root/*": [
+                "./*"
+            ]
+        },
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

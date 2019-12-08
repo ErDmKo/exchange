@@ -1,0 +1,31 @@
+.dots {
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    user-select: none;
+    transform: translate(-50%, 0px);
+    &:hover {
+        cursor: pointer;
+    }
+    &__item {
+        width: 15px;
+        height: 15px;
+        opacity: .5;
+        position: relative;
+        display: inline-block;
+        &:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            background: #fff;
+            border-radius: 100%;
+            width: 6px;
+            height: 6px;
+        }
+        &.active {
+            opacity: 1;
+        }
+    }
+}
