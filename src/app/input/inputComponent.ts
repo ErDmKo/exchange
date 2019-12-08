@@ -1,6 +1,9 @@
 import { h , Component } from "preact";
 import style from "./style.css";
 import { noop, debounce } from "../const";
+import currencyStyle from "../currency/style.css";
+
+var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
 export type InputProps = {
   isFrom: boolean
@@ -21,17 +24,18 @@ export class inputComponent extends Component<InputProps> {
   constructor(props: InputProps) {
     super(props);
   }
-  restorePos() {
+  restorePos(rawPosition: number = 0) {
+    const position = rawPosition || this.cursorPosition ;
     const inputElem = this.input;
     const sel = window.getSelection();
-    if (!(sel && inputElem && this.focused && this.cursorPosition)) {
+    if (!(sel && inputElem && this.focused && position)) {
       return;
     }
     const range = document.createRange();
     try {
       range.setStart(
         inputElem.childNodes[0] || inputElem,
-        Math.min(this.cursorPosition, inputElem.innerText.length)
+        Math.min(position, inputElem.innerText.length)
       );
     } catch (e) { }
     range.collapse(true);
@@ -60,7 +64,7 @@ export class inputComponent extends Component<InputProps> {
         return;
       }
       setValid(true);
-    }, 1000)
+    }, 700)
   onInput = (
     setAmount: (val: number) => void,
     setValid: (val: boolean) => void,
@@ -74,15 +78,27 @@ export class inputComponent extends Component<InputProps> {
     if (!sel) {
       return;
     }
-    this.cursorPosition = sel.getRangeAt(0).startOffset;
+    try {
+      this.cursorPosition = sel.getRangeAt(0).startOffset;
+    } catch (e) {
+      this.cursorPosition = 0;
+    }
     inputElem.innerHTML = (val || '').toString();
     this.restorePos();
     this.validate(val, inputElem, setValid, setAmount);
   }
 
   componentDidMount() {
+    const input = this.input!;
     if (this.focused != this.props.isFocused && this.props.isFrom) {
-      this.input!.focus();
+      input.focus();
+      const sliderEl = document.querySelector(`.${currencyStyle['slider']}`);
+      if (sliderEl && iOS) {
+        sliderEl.addEventListener('click', function call() {
+          input.focus();
+          sliderEl.removeEventListener('click', call);
+        });
+      }
     }
   }
   shouldComponentUpdate(newProps: InputProps) {

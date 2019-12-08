@@ -10,29 +10,29 @@ This is an abstract app which implements currency exchange functionality. You ha
 ```
     npm run build
 ```
-This comand will make obfuscated assets for static server in dist directory.
+This comand will makes obfuscated assets for static server in dist directory.
 
 ## How to build for dev
 ```
     npm run watch
 ```
-This comand starts local server on 10001 port with **not obfuscated** source code and this server will rebuild source on every change
+This comand starts local server on 10001 port with **not obfuscated** source code and this server rebuilds source on every change
 
 ## How to build for dev and uglify
 ```
     npm run watch:build
 ```
 
-This comand starts local server on 10001 port with **obfuscated** source code and this server will rebuild source on every change
+This comand starts local server on 10001 port with **obfuscated** source code and this server rebuilds source on every change
 
 ## How to run tests
 ```
     npm run test
 ```
-This command run local server on 8080 port and run puppeteer tests on it and extit after run
+This command runs local server on 8080 port and runs puppeteer tests on it and extits after run
 
 ## How to run tests in watch mode
 ```
     npm run wath:test
 ```
-This command run local server in watch on 8080 port and run puppeteer tests on it and will watch for next changes for rerun this tests
+This command runs local server in watch on 8080 port and runs puppeteer tests on it and watches for next changes to rerun this tests

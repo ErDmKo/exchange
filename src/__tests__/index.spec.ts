@@ -15,6 +15,8 @@ afterAll(() => {
     browser.close();
 });
 
+const ACTION_TIMEOUT = 1000;
+
 
 describe("Simple e2e tests", () => {
     test("title", async () => {
@@ -35,7 +37,7 @@ describe("Simple e2e tests", () => {
         expect(usdPocket).toBeTruthy();
         expect(euroPocket).toBeTruthy();
         await page.type('#iFUSD', '1hi0');
-        await page.waitFor(500);
+        await page.waitFor(ACTION_TIMEOUT);
         await expect(page.$eval('#iTEUR', (e: any) => e.innerText))
             .resolves
             .toBeTruthy();
@@ -48,12 +50,12 @@ describe("Simple e2e tests", () => {
             .toBe(parseInt(euroPocketNew));
     });
     test("change currnecys on top and bottom", async () => {
-        await page.waitForSelector('#iFUSD', { visible: true });
         await expect(page.$eval('#nFUSD', (e: any) => e.innerText))
             .resolves
             .toMatch('USD');
+        await page.waitForSelector('#iFUSD', { visible: true });
         await page.type('#iFUSD', '9');
-        await page.waitFor(500);
+        await page.waitFor(ACTION_TIMEOUT);
         const gbp = await page.$('#nFGBP');
         await expect(gbp!.isIntersectingViewport())
             .resolves
@@ -62,7 +64,7 @@ describe("Simple e2e tests", () => {
             .resolves
             .toBeTruthy();
         await page.click('#dFGBP');
-        await page.waitFor(500);
+        await page.waitFor(ACTION_TIMEOUT);
         expect(gbp).toBeTruthy();
         await expect(gbp!.isIntersectingViewport())
             .resolves
@@ -71,16 +73,16 @@ describe("Simple e2e tests", () => {
             .resolves
             .toBeFalsy();
         await page.type('#iFGBP', '10');
-        await page.waitFor(500);
+        await page.waitFor(ACTION_TIMEOUT);
         const euroRaite = await page.$eval('#cFGBP', (e: any) => e.innerText);
         const euroAmount = await page.$eval('#iTEUR', (e: any) => e.innerText)
-        expect(parseFloat(euroAmount).toFixed(1))
-            .toBe((10 * parseFloat(euroRaite)).toFixed(1));
+        expect(parseFloat(euroAmount).toFixed())
+            .toBe((10 * parseFloat(euroRaite)).toFixed());
         await page.click('#dTUSD');
-        await page.waitFor(500);
+        await page.waitFor(ACTION_TIMEOUT);
         const usdRaite = await page.$eval('#cFGBP', (e: any) => e.innerText);
         const usdAmount = await page.$eval('#iTUSD', (e: any) => e.innerText)
-        expect(parseFloat(usdAmount).toFixed(1))
-            .toBe((10 * parseFloat(usdRaite)).toFixed(1));
+        expect(parseFloat(usdAmount).toFixed())
+            .toBe((10 * parseFloat(usdRaite)).toFixed());
     });
 })
