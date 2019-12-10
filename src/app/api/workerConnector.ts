@@ -1,8 +1,7 @@
 import { Dispatch } from "react";
 import { updateAction } from "./duck";
-import { setToAmount } from "../input/duck";
 import { AppStore } from "@src/index";
-import { currenciesNames } from "../const";
+import { setAmountsFromState } from "../input/inputContanier";
 
 export const workerConnector = (
   getState: () => AppStore,
@@ -14,19 +13,16 @@ export const workerConnector = (
       fetchWorker.removeEventListener("message", listner);
     }
     fetchWorker.addEventListener("message", event => {
-      dispatch(updateAction(event.data))
+      dispatch(updateAction(event.data));
       const state = getState();
-      if (state.isValid) {
-        currenciesNames.forEach((to: string)=> {
-          const from = state.currency.from;
-          const rate = state.rates[from][to];
-          dispatch(
-            setToAmount(
-              to,
-              state.amounts[from].from * rate
-            )
-          )
-        });
+      const selectedCurrnecy = state.exchange.isFromDirection
+        ? state.currency.from
+        : state.currency.to;
+      const amount = state.exchange.isFromDirection
+        ? state.amounts[selectedCurrnecy].from
+        : state.amounts[selectedCurrnecy].to;
+      if (amount) {
+        dispatch(setAmountsFromState(state, selectedCurrnecy, amount));
       }
     });
   });

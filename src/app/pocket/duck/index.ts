@@ -2,7 +2,7 @@ import { currencies } from "@src/app/const";
 import { combineReducers, Reducer, Action } from "redux";
 
 const poketInitState = currencies.reduce((collector, currency) => {
-  collector[currency.name] = 10 + Math.random() * 100;
+  collector[currency.name] = 10 + Math.random() * 90;
   return collector;
 }, {} as Record<string, number>);
 
@@ -29,7 +29,10 @@ export const addToPokcet = (currency: string, val: number): PocketAction => {
     val
   };
 };
-export const removeFromPokcet = (currency: string, val: number): PocketAction => {
+export const removeFromPokcet = (
+  currency: string,
+  val: number
+): PocketAction => {
   return {
     type: `${POCKET_DECREMENT}_${currency}`,
     val
@@ -39,10 +42,7 @@ export const removeFromPokcet = (currency: string, val: number): PocketAction =>
 const reducer = combineReducers(
   Object.entries(poketInitState).reduce(
     (collector, [pocketName, pocketVal]) => {
-      collector[pocketName] = (
-        state = pocketVal,
-        action: PocketAction
-      ) => {
+      collector[pocketName] = (state = pocketVal, action: PocketAction) => {
         switch (action.type) {
           case `${POCKET_SET}_${pocketName}`:
             return action.val;

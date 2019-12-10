@@ -9,7 +9,7 @@ const args = {
   ["symbols"]: currencies
     .map(e => e.name)
     .filter(e => e !== base)
-    .join(","),
+    .join(",")
 };
 const query = Object.entries(args)
   .map(keyVal => keyVal.join("="))
@@ -21,14 +21,14 @@ const currencyNoise = (data: any) => {
     Object.entries(data).forEach(([_, currncy]: any[]) => {
       Object.entries(currncy).forEach(([key, val]: any[]) => {
         if (_ !== key) {
-          currncy[key] = val * (1 + Math.random() / 100)
+          currncy[key] = val * (1 + Math.random() / 100);
         }
-      })
+      });
     });
     postMessageAny(data);
     currencyNoise(JSON.parse(rawInfo));
   }, 1000);
-}
+};
 
 const onsucces = (data: any) => {
   let info: Record<string, any> = {};
@@ -39,9 +39,12 @@ const onsucces = (data: any) => {
   }
   if (info && info.rates) {
     const rateEntries = Object.entries(
-      Object.assign({
-        [base]: 1
-      }, info.rates) as Record<string, number>
+      Object.assign(
+        {
+          [base]: 1
+        },
+        info.rates
+      ) as Record<string, number>
     );
     // it just rounded values form one request
     const result: Rates = rateEntries.reduce((collect, [sigin, val]) => {

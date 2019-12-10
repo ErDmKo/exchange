@@ -1,5 +1,5 @@
 import { h, Component } from "preact";
-import style  from "./style.css";
+import style from "./style.css";
 import { pocketContanier } from "../pocket/pocketContainer";
 import { currenciesNames } from "../const";
 import { rateContanier } from "../rate/rateContanier";
@@ -14,21 +14,21 @@ export type CurrencyProps = {
   }[];
   from?: string;
   to?: string;
+  isFromDirection?: boolean;
   rates?: Record<string, Record<string, number>>;
-  selectFrom?: (name: string) => void,
-  selectTo?: (name: string) => void,
+  selectCurrency?: (isFromDirection: boolean, name: string) => void;
 };
 type SliderState = {
-  elem?: HTMLElement
-  drag: boolean
-  delta: number
-  leftPosition: number
-}
+  elem?: HTMLElement;
+  drag: boolean;
+  delta: number;
+  leftPosition: number;
+};
 export class currencyComponent extends Component<CurrencyProps, SliderState> {
-  dispach: (name: string) => void
-  currencyIndex: number
+  dispach: (isFromDirection: boolean, name: string) => void;
+  currencyIndex: number;
   slider: HTMLDivElement | null = null;
-  
+
   constructor(props: CurrencyProps) {
     super(props);
     this.state = {
@@ -36,35 +36,32 @@ export class currencyComponent extends Component<CurrencyProps, SliderState> {
       drag: false,
       leftPosition: 0
     };
-    this.dispach = this.props.isFrom ?
-      props.selectFrom! :
-      props.selectTo!
+    this.dispach = this.props.selectCurrency!;
     this.currencyIndex = this.getCurruncyIndex(this.props);
   }
   getCurruncyIndex(props: CurrencyProps) {
-    return currenciesNames.indexOf(props.isFrom ?
-      props.from! :
-      props.to!
-    )
+    return currenciesNames.indexOf(props.isFrom ? props.from! : props.to!);
   }
   setElemToIndex(index: number) {
     if (!this.state.elem) {
       return;
     }
     const position = index * this.state.elem.clientWidth;
-    this.state.elem.style['transform'] = `translate(-${position}px, 0)`
+    this.state.elem.style["transform"] = `translate(-${position}px, 0)`;
   }
   componentDidMount() {
     if (!(this.props.from && this.state.elem)) {
       return;
     }
-    this.setElemToIndex(this.currencyIndex)
+    this.setElemToIndex(this.currencyIndex);
   }
   shouldComponentUpdate(nextProps: CurrencyProps) {
-    return !this.state.drag && 
-    (this.currencyIndex !== this.getCurruncyIndex(nextProps)
-      || this.props.rates !== nextProps.rates 
-      || this.props.from !== nextProps.from)
+    return (
+      !this.state.drag &&
+      (this.currencyIndex !== this.getCurruncyIndex(nextProps) ||
+        this.props.rates !== nextProps.rates ||
+        this.props.from !== nextProps.from)
+    );
   }
   componentWillUpdate(nextProps: CurrencyProps, nextState: SliderState) {
     if (!(this.state && this.state.elem)) {
@@ -72,7 +69,7 @@ export class currencyComponent extends Component<CurrencyProps, SliderState> {
     }
     const newIndex = this.getCurruncyIndex(nextProps);
     this.setElemToIndex(newIndex);
-    this.currencyIndex = newIndex
+    this.currencyIndex = newIndex;
   }
   onTouchStart(e: TouchEvent) {
     if (!e.target) {
@@ -85,19 +82,18 @@ export class currencyComponent extends Component<CurrencyProps, SliderState> {
       drag: true,
       leftPosition: clientX
     });
-  };
+  }
   onTouchMove(e: TouchEvent) {
     if (!e.target) {
       return;
     }
     const { clientX } = e.touches[0];
-    
-    if(this.state.elem) {
-      const previous = this.state.elem.style['transform'].match(/\d+/);
+
+    if (this.state.elem) {
+      const previous = this.state.elem.style["transform"].match(/\d+/);
       if (previous) {
-        this.state.elem!.style['transform'] = `translate(${
-          -1 * (parseInt(previous[0]) + (this.state.leftPosition -  clientX))
-        }px, 0)`;
+        this.state.elem!.style["transform"] = `translate(${-1 *
+          (parseInt(previous[0]) + (this.state.leftPosition - clientX))}px, 0)`;
       }
     }
     this.setState({
@@ -112,83 +108,85 @@ export class currencyComponent extends Component<CurrencyProps, SliderState> {
     const delta = this.state.delta - clientX;
     const absDelta = Math.abs(delta);
     this.state.elem!.classList.remove(style["currency__drag"]);
-    const newIndex = this.currencyIndex + (delta / absDelta)
+    const newIndex = this.currencyIndex + delta / absDelta;
     const index = currenciesNames[Math.max(0, newIndex)];
 
-    this.setState({
-      drag: false
-    }, () => {
-      if (absDelta > 100 && newIndex < currenciesNames.length) {
-        this.dispach(index);
-      } else {
-        this.setElemToIndex(this.currencyIndex);
-      }
-
-    })
-  }
-  render({
-    isFrom,
-    currencies, 
-    rates,
-  }: CurrencyProps, 
-  state: SliderState
-  ) {
-    const isRateReady = Object.keys(rates || {}).length;
-    return h('div', {
-      ref: (input: any) => this.slider = input,
-      ['onScroll']: (e: any) => {
-        const { target } = e 
-        target.scrollLeft = 0;
+    this.setState(
+      {
+        drag: false
       },
-      className: [
-        style['slider'],
-        !isFrom ? style["currency__to"] : "",
-      ].join(" "),
-    },
-      [
-        h("ul",
-        {
-          className: [
-            style["currency"],
-          ].join(" "),
-          ["onTouchStart"]: this.onTouchStart.bind(this),
-          ["onTouchMove"]: this.onTouchMove.bind(this),
-          ["onTouchEnd"]: this.onTouchEnd.bind(this),
-          ref: (refElem: any) => { state.elem = refElem }
+      () => {
+        if (absDelta > 100 && newIndex < currenciesNames.length) {
+          this.dispach(this.props.isFromDirection!, index);
+        } else {
+          this.setElemToIndex(this.currencyIndex);
+        }
+      }
+    );
+  }
+  render({ isFrom, currencies, rates }: CurrencyProps, state: SliderState) {
+    const isRateReady = Object.keys(rates || {}).length;
+    return h(
+      "div",
+      {
+        ref: (input: any) => (this.slider = input),
+        ["onScroll"]: (e: any) => {
+          const { target } = e;
+          target.scrollLeft = 0;
         },
-        currencies.map(currency => {
-          return h(
-            "li",
-            {
-              className: style["currency__item"]
-            },
-            [
-              h(
-                "div",
-                {
-                  className: style["currency__name"],
-                  id: `n${isFrom ? "F" : "T"}${currency.name}`
-                },
-                currency.name
-              ),
-              isRateReady ? inputContanier({
-                isFrom,
-                currency: currency.name
-              }) : null,
-              pocketContanier(currency),
-              !isFrom &&
-              isRateReady ? rateContanier({
-                formSigin: currency.sigin,
-                isFrom: false,
-                fromName: currency.name,
-              }) : null
-            ]
-          );
-        })
+        className: [style["slider"], !isFrom ? style["currency__to"] : ""].join(
+          " "
+        )
+      },
+      [
+        h(
+          "ul",
+          {
+            className: [style["currency"]].join(" "),
+            ["onTouchStart"]: this.onTouchStart.bind(this),
+            ["onTouchMove"]: this.onTouchMove.bind(this),
+            ["onTouchEnd"]: this.onTouchEnd.bind(this),
+            ref: (refElem: any) => {
+              state.elem = refElem;
+            }
+          },
+          currencies.map(currency => {
+            return h(
+              "li",
+              {
+                className: style["currency__item"]
+              },
+              [
+                h(
+                  "div",
+                  {
+                    className: style["currency__name"],
+                    id: `n${isFrom ? "F" : "T"}${currency.name}`
+                  },
+                  currency.name
+                ),
+                isRateReady
+                  ? inputContanier({
+                      isFrom,
+                      currency: currency.name
+                    })
+                  : null,
+                pocketContanier(currency),
+                !isFrom && isRateReady
+                  ? rateContanier({
+                      formSigin: currency.sigin,
+                      isFrom: false,
+                      fromName: currency.name
+                    })
+                  : null
+              ]
+            );
+          })
         ),
         dotsContanier({
           isFrom
-        }),
-    ]);
+        })
+      ]
+    );
   }
-};
+}

@@ -1,4 +1,4 @@
-import { h , Component } from "preact";
+import { h, Component } from "preact";
 import style from "./style.css";
 import { noop, debounce } from "../const";
 import currencyStyle from "../currency/style.css";
@@ -6,16 +6,16 @@ import currencyStyle from "../currency/style.css";
 var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
 export type InputProps = {
-  isFrom: boolean
-  currency: string
-  maxVal?: number
-  setAmount?: (val: number) => void,
-  setValid?: (val: boolean) => void
-  amount?: number
-  isFocused?: boolean
-  selectCurrency?: (name: string) => void
+  isFrom: boolean;
+  currency: string;
+  maxVal?: number;
+  setAmount?: (val: number) => void;
+  setValid?: (val: boolean) => void;
+  setDirection?: (val: boolean, name: string) => void;
+  amount?: number;
+  isFocused?: boolean;
 };
-const notNumbers = /[^\d\.\,]+/i
+const notNumbers = /[^\d\.\,]+/i;
 export class inputComponent extends Component<InputProps> {
   cursorPosition: number = 0;
   focused: boolean = false;
@@ -25,7 +25,7 @@ export class inputComponent extends Component<InputProps> {
     super(props);
   }
   restorePos(rawPosition: number = 0) {
-    const position = rawPosition || this.cursorPosition ;
+    const position = rawPosition || this.cursorPosition;
     const inputElem = this.input;
     const sel = window.getSelection();
     if (!(sel && inputElem && this.focused && position)) {
@@ -37,34 +37,37 @@ export class inputComponent extends Component<InputProps> {
         inputElem.childNodes[0] || inputElem,
         Math.min(position, inputElem.innerText.length)
       );
-    } catch (e) { }
+    } catch (e) {}
     range.collapse(true);
     sel.removeAllRanges();
     sel.addRange(range);
   }
-  validate = debounce((
+  validate = debounce(
+    (
       val: string,
       inputElem: HTMLDivElement,
-      setValid: (val: boolean) => void,
-      setAmount: (val: number) => void,
+      setAmount: (val: number) => void
     ) => {
       let floatVal = parseFloat(val);
-      floatVal = Math.min(floatVal || 0, this.props.maxVal!)
-      floatVal = Math.round(floatVal * 100) / 100;
+      const rawfloatVal = Math.min(floatVal || 0, this.props.maxVal!);
+      floatVal = Math.round(rawfloatVal * 100) / 100;
       const sel = window.getSelection();
       if (!sel) {
         return;
       }
       this.cursorPosition = sel.getRangeAt(0).startOffset;
-      inputElem.innerHTML = (floatVal || '').toString();
+      inputElem.innerHTML = (floatVal || "").toString();
+      const inputLength = inputElem.innerText.toString().length;
+      this.cursorPosition =
+        rawfloatVal == this.props.maxVal ? inputLength : this.cursorPosition;
       this.restorePos();
-      const inputLength = inputElem.innerHTML.toString().length;
       setAmount(floatVal);
       if (!inputLength) {
         return;
       }
-      setValid(true);
-    }, 1000)
+    },
+    1000
+  );
   onInput = (
     setAmount: (val: number) => void,
     setValid: (val: boolean) => void,
@@ -72,84 +75,85 @@ export class inputComponent extends Component<InputProps> {
   ) => {
     setValid(false);
     const inputElem = e.target as HTMLInputElement;
-    let val = inputElem.innerHTML.replace(notNumbers, '');
-    val = val.replace(',', '.');
+    const rawInput = inputElem.innerText;
+    let val = rawInput.replace(notNumbers, "");
+    val = val.replace(",", ".");
+    const delta = rawInput.length - val.length;
     const sel = window.getSelection();
     if (!sel) {
       return;
     }
     try {
-      this.cursorPosition = sel.getRangeAt(0).startOffset;
+      this.cursorPosition = sel.getRangeAt(0).startOffset - delta;
     } catch (e) {
       this.cursorPosition = 0;
     }
-    inputElem.innerHTML = (val || '').toString();
+    inputElem.innerHTML = (val || "").toString();
     this.restorePos();
-    this.validate(val, inputElem, setValid, setAmount);
-  }
+    this.validate(val, inputElem, setAmount);
+  };
 
   componentDidMount() {
     const input = this.input!;
     if (this.focused != this.props.isFocused && this.props.isFrom) {
       input.focus();
-      const sliderEl = document.querySelector(`.${currencyStyle['slider']}`);
+      const sliderEl = document.querySelector(`.${currencyStyle["slider"]}`);
       if (sliderEl && iOS) {
-        sliderEl.addEventListener('click', function call() {
+        sliderEl.addEventListener("click", function call() {
           input.focus();
-          sliderEl.removeEventListener('click', call);
+          sliderEl.removeEventListener("click", call);
         });
       }
     }
   }
   shouldComponentUpdate(newProps: InputProps) {
-    return this.props.isFocused != newProps.isFocused ||
-      this.props.amount != newProps.amount;
+    return (
+      this.props.isFocused != newProps.isFocused ||
+      this.props.amount != newProps.amount
+    );
   }
 
   componentDidUpdate() {
-    if (this.props.isFocused && this.props.isFrom) {
+    if (this.props.isFocused) {
       this.restorePos();
       this.input!.focus();
     }
   }
   render({
-    selectCurrency,
+    setDirection,
+    isFocused,
     isFrom,
     setAmount,
     setValid,
     amount,
     currency
   }: InputProps) {
-    let formatedAmount = (amount || 0);
+    let formatedAmount = amount || 0;
     let stringAmount;
     if (!formatedAmount) {
-      stringAmount = '';
-    }  else {
-      stringAmount = isFrom ? 
-        formatedAmount.toString() : 
-        formatedAmount.toFixed(2)
+      stringAmount = "";
+    } else {
+      stringAmount = isFocused
+        ? (Math.round(formatedAmount * 100) / 100).toString()
+        : formatedAmount.toFixed(2);
     }
     return h("div", {
-      ["contenteditable"]: isFrom,
-      ['inputmode']: 'decimal',
-      id: `i${isFrom? 'F' : 'T'}${currency}`,
+      ["contenteditable"]: true,
+      ["inputmode"]: "decimal",
+      id: `i${isFrom ? "F" : "T"}${currency}`,
       className: [
         style[!isFrom ? "input" : "input_to"],
-        stringAmount ? style["hasVal"] : ''
-      ].join(' '),
-      ref: (input: any) => this.input = input,
-      ['onInput']: isFrom ? this.onInput.bind(
-        this,
-        setAmount!,
-        setValid!
-      ) : noop,
-      ['onBlur']: () => {
+        stringAmount ? style["hasVal"] : ""
+      ].join(" "),
+      ref: (input: any) => (this.input = input),
+      ["onInput"]: this.onInput.bind(this, setAmount!, setValid!),
+      ["onBlur"]: () => {
         this.focused = false;
       },
-      ['onfocus']: () => {
+      ["onfocus"]: () => {
         this.focused = true;
         if (!this.props.isFocused) {
-          selectCurrency!(currency)
+          setDirection!(this.props.isFrom, this.props.currency);
         }
       },
       innerHTML: stringAmount

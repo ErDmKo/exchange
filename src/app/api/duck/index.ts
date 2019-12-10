@@ -3,14 +3,14 @@ export type Rates = Record<string, Record<string, number>>;
 export const UPDATE_RATE = "UPDATE_RATE" as const;
 
 type UpdateAction = {
-  type: typeof UPDATE_RATE,
-  data: Rates
-}
+  type: typeof UPDATE_RATE;
+  data: Rates;
+};
 
 export const updateAction = (data: Rates): UpdateAction => {
   return {
     type: UPDATE_RATE,
-    data,
+    data
   };
 };
 

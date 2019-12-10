@@ -1,2 +1,2 @@
-const mod: { [cls: string]: string }
-export default mod
+const mod: { [cls: string]: string };
+export default mod;

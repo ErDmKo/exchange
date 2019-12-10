@@ -8,7 +8,7 @@ import rates from "./app/api/duck";
 import pockets from "./app/pocket/duck";
 import currency from "./app/rate/duck";
 import amounts from "./app/input/duck";
-import isValid from "./app/exchange/duck";
+import exchange from "./app/exchange/duck";
 import { enableBatching } from "./duck";
 
 declare module "preact" {
@@ -20,27 +20,25 @@ declare module "preact" {
 }
 
 const rootReducer = combineReducers({
-  isValid,
+  exchange,
   rates,
   pockets,
   currency,
   amounts
-})
-export const store = createStore(
-  enableBatching(rootReducer)
-);
-
+});
+export const store = createStore(enableBatching(rootReducer));
+(window as any).appStore = store;
 export type AppStore = ReturnType<typeof store.getState>;
 
 workerConnector(store.getState, store.dispatch);
 
 const mainElem = (props: Record<string, any>) => {
   return h(
-      Provider,
-      {
-        store
-      },
-      exchangeContanier({})
-    )
+    Provider,
+    {
+      store
+    },
+    exchangeContanier({})
+  );
 };
 render(h(mainElem, null), window.document.body);

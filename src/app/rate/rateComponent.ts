@@ -2,7 +2,7 @@ import { h } from "preact";
 import style from "./style.css";
 
 export type RateProps = {
-  isFrom: boolean,
+  isFrom: boolean;
   fromName?: string;
   formSigin?: string;
   rate?: number;
@@ -15,23 +15,38 @@ export const rateComponent = ({
   fromName,
   formSigin,
   toSigin,
-  rate 
+  rate
 }: RateProps) => {
   return h(
     "div",
     {
-      className: style[isFrom ? "rate": "rate_to"]
-    }, formSigin ? [
-      h('span', {
-        className: style['rate_to__sigin']
-      }, formSigin),
-      '1 = ',
-      h('span', {
-        className: style['rate_to__sigin']
-      }, toSigin || ""),
-      h('span', {
-        id: `c${isFrom ? 'F' : 'T'}${fromName}`
-      }, (rate || 1).toFixed(2))
-    ] : ''
+      className: style[isFrom ? "rate" : "rate_to"]
+    },
+    formSigin
+      ? [
+          h(
+            "span",
+            {
+              className: style["rate_to__sigin"]
+            },
+            formSigin
+          ),
+          "1 = ",
+          h(
+            "span",
+            {
+              className: style["rate_to__sigin"]
+            },
+            toSigin || ""
+          ),
+          h(
+            "span",
+            {
+              id: `c${isFrom ? "F" : "T"}${fromName}`
+            },
+            (rate || 1).toFixed(2)
+          )
+        ]
+      : ""
   );
 };

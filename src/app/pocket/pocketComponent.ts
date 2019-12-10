@@ -7,23 +7,28 @@ export type PocketProps = {
   val?: number;
 };
 
-export const pocketComponent = ({
-  name,
-  sigin,
-  val
-}: PocketProps) => {
+export const pocketComponent = ({ name, sigin, val }: PocketProps) => {
   return h(
     "div",
     {
       className: style["pocket"]
-    },[
-      'You have ',
-      h('span', {
-        className: style["pocket__sigin"]
-      }, sigin),
-      h('span', {
-        id: `p${name}`
-      }, Math.abs(val || 0).toFixed(2))
+    },
+    [
+      "You have ",
+      h(
+        "span",
+        {
+          className: style["pocket__sigin"]
+        },
+        sigin
+      ),
+      h(
+        "span",
+        {
+          id: `p${name}`
+        },
+        Math.abs(val || 0).toFixed(2)
+      )
     ]
   );
 };
