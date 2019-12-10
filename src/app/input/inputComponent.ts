@@ -1,9 +1,6 @@
 import { h, Component } from "preact";
 import style from "./style.css";
-import { noop, debounce } from "../const";
-import currencyStyle from "../currency/style.css";
-
-var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+import { debounce } from "../const";
 
 export type InputProps = {
   isFrom: boolean;
@@ -97,13 +94,6 @@ export class inputComponent extends Component<InputProps> {
     const input = this.input!;
     if (this.focused != this.props.isFocused && this.props.isFrom) {
       input.focus();
-      const sliderEl = document.querySelector(`.${currencyStyle["slider"]}`);
-      if (sliderEl && iOS) {
-        sliderEl.addEventListener("click", function call() {
-          input.focus();
-          sliderEl.removeEventListener("click", call);
-        });
-      }
     }
   }
   shouldComponentUpdate(newProps: InputProps) {
